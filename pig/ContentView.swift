@@ -8,9 +8,10 @@
 import SwiftUI
 struct ContentView: View {
     @State private var turnScore = 0
-    @State private var gameScore = 0
+    @State private var gameScore = 50
     @State private var randomValue = 0
     @State private var rotation = 0.0
+    @State private var gameOver = false
     var body: some View {
         NavigationView {
             ZStack {
@@ -38,22 +39,39 @@ struct ContentView: View {
                             endTurn()
                             withAnimation(.easeInOut(duration: 1 )) {
                                 rotation += 360
+                                if gameScore >= 100 {
+                                    gameOver = true
+                                }
                             }
                         }
                         .buttonStyle(CustomButtonStyle())
                     }
                     CustomText(text: "Game Score")
                     CustomText(text: "Game Score: \(gameScore)")
-                    Spacer ()
                     NavigationLink("How to play", destination: InstructionsView())
                         .font(Font.custom("Marker Felt", size: 24))
                         .padding()
+                    Button("Reset") {
+                        endTurn()
+                        gameScore = 0
+                    }
+                    .font(Font.custom ("Marker Felt", size: 24))
+                    }
+                    Spacer ()
                 }
+                .alert(isPresented: $gameOver, content: {
+                    Alert(title: Text("You Won The Game!!!"), dismissButton:
+                            .destructive(Text("Play again"), action: {
+                                withAnimation(Animation.default) {
+                                    gameScore = 0
+                                    gameOver = false
+                                    
+                                }
+                                
+                        }))
+                })
             }
         }
-    }
-    
-    
     func endTurn() {
         turnScore = 0
         randomValue = 0
@@ -77,54 +95,56 @@ struct ContentView: View {
             }
         }
     }
-    
-    struct CustomButtonStyle: ButtonStyle {
-        func makeBody (configuration: Configuration) -> some View {
-            configuration.label.frame(width: 50)
-                .font(Font.custom("Marker Felt", size:24))
-                .padding()
-                .background(.red).opacity(configuration.isPressed ? 0.0 : 1.0)
-                .foregroundColor(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-        }
     }
+
     
-    struct CustomText: View {
-        let text: String
-        var body: some View {
-            Text(text).font(Font.custom ("Marker Felt", size: 36))
-        }
-    }
-    
-    struct ContentView_Previews: PreviewProvider {
-        static var previews: some View {
-            ContentView()
-        }
-    }
-}
-struct InstructionsView: View {
-    var body: some View {
-        ZStack{
-            Color.gray.opacity(0.7).ignoresSafeArea()
-            VStack {
-                Image("Pig").resizable().frame(width: 150, height: 150)
-                Text("Pig").font(.title)
-                VStack (alignment: .leading){
-                    Text("In the game of pig, players take individual turns. Each turn, a player repeatly rolls a single die until either is a pig or the player decides to \"hold\".")
-                        .padding()
-                    Text ("If the player rolls a pig, they score nothing, and it becomes the next players turn.")
-                        .padding()
-                    Text ("If the player rolls any other number, it is added to their total, and the players turn continues.")
-                        .padding()
-                    
-                    Text ("If a player chooses to \"hold\", their total is added to their game score, and it becomes the next players turn.")
-                        .padding()
-                    Text("A player wins the game when the game score becomes 100 or more on their turn.")
-                        .padding()
+                struct CustomButtonStyle: ButtonStyle {
+                    func makeBody (configuration: Configuration) -> some View {
+                        configuration.label.frame(width: 50)
+                            .font(Font.custom("Marker Felt", size:24))
+                            .padding()
+                            .background(.red).opacity(configuration.isPressed ? 0.0 : 1.0)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
                 }
-                Spacer ()
+                
+                struct CustomText: View {
+                    let text: String
+                    var body: some View {
+                        Text(text).font(Font.custom ("Marker Felt", size: 36))
+                    }
+                }
+                
+                struct ContentView_Previews: PreviewProvider {
+                    static var previews: some View {
+                        ContentView()
+                    }
+                }
+            struct InstructionsView: View {
+                var body: some View {
+                    ZStack{
+                        Color.gray.opacity(0.7).ignoresSafeArea()
+                        VStack {
+                            Image("Pig").resizable().frame(width: 150, height: 150)
+                            Text("Pig").font(.title)
+                            VStack (alignment: .leading){
+                                Text("In the game of pig, players take individual turns. Each turn, a player repeatly rolls a single die until either is a pig or the player decides to \"hold\".")
+                                    .padding()
+                                Text ("If the player rolls a pig, they score nothing, and it becomes the next players turn.")
+                                    .padding()
+                                Text ("If the player rolls any other number, it is added to their total, and the players turn continues.")
+                                    .padding()
+                                
+                                Text ("If a player chooses to \"hold\", their total is added to their game score, and it becomes the next players turn.")
+                                    .padding()
+                                Text("A player wins the game when the game score becomes 100 or more on their turn.")
+                                    .padding()
+                            }
+                            Spacer ()
+                        }
+                    }
+                }
             }
-        }
-    }
-}
+
 
